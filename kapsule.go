@@ -1,0 +1,113 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"os"
+
+	_ "github.com/PlakarKorp/kapsule/connectors/fs"
+	_ "github.com/PlakarKorp/kapsule/connectors/ptar"
+	_ "github.com/PlakarKorp/kapsule/connectors/sftp"
+	_ "github.com/PlakarKorp/kapsule/connectors/stdio"
+
+	"github.com/PlakarKorp/kloset/caching"
+	"github.com/PlakarKorp/kloset/logging"
+	"github.com/PlakarKorp/kloset/repository"
+	"github.com/PlakarKorp/plakar/appcontext"
+	"github.com/PlakarKorp/plakar/cookies"
+	"github.com/PlakarKorp/plakar/subcommands"
+	"github.com/PlakarKorp/plakar/subcommands/archive"
+	"github.com/PlakarKorp/plakar/subcommands/cat"
+	"github.com/PlakarKorp/plakar/subcommands/check"
+	"github.com/PlakarKorp/plakar/subcommands/diff"
+	"github.com/PlakarKorp/plakar/subcommands/digest"
+	"github.com/PlakarKorp/plakar/subcommands/help"
+	"github.com/PlakarKorp/plakar/subcommands/locate"
+	"github.com/PlakarKorp/plakar/subcommands/ls"
+	"github.com/PlakarKorp/plakar/subcommands/ptar"
+	"github.com/PlakarKorp/plakar/subcommands/restore"
+	"github.com/PlakarKorp/plakar/subcommands/server"
+	"github.com/PlakarKorp/plakar/subcommands/ui"
+)
+
+func main() {
+	var kapsulePath string
+	flag.StringVar(&kapsulePath, "f", "", "Path to the kapsule")
+	flag.Parse()
+
+	if flag.NArg() == 0 {
+		flag.Usage()
+		return
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error getting current working directory: %v\n", err)
+		return
+	}
+
+	ctx := appcontext.NewAppContext()
+	ctx.CWD = cwd
+	ctx.MaxConcurrency = 42
+	ctx.SetCookies(cookies.NewManager("/tmp/plakar_cookies"))
+
+	ctx.SetLogger(logging.NewLogger(os.Stdout, os.Stderr))
+	ctx.SetCache(caching.NewManager("/tmp/foobar"))
+
+	if flag.Arg(0) == "create" {
+		repo, err := repository.Inexistent(ctx.GetInner(), map[string]string{
+			"location": kapsulePath,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating kapsule: %v\n", err)
+			return
+		}
+
+		subc := &ptar.Ptar{}
+		args := append([]string{"-o", kapsulePath}, flag.Args()[1:]...)
+		if err := subc.Parse(ctx, args); err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing ptar command: %v\n", err)
+			os.Exit(1)
+		} else if _, err := subc.Execute(ctx, repo); err != nil {
+			fmt.Fprintf(os.Stderr, "Error executing ptar command: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
+	repo, err := openKapsule(ctx, kapsulePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error opening kapsule: %v\n", err)
+		return
+	}
+	defer repo.Close()
+
+	var subcommands = map[string]subcommands.Subcommand{
+		"archive": &archive.Archive{},
+		"cat":     &cat.Cat{},
+		"check":   &check.Check{},
+		// clone
+		"diff":   &diff.Diff{},
+		"digest": &digest.Digest{},
+		"help":   &help.Help{},
+		// info
+		"locate": &locate.Locate{},
+		"ls":     &ls.Ls{},
+		// mount
+		"restore": &restore.Restore{},
+		"server":  &server.Server{},
+		// sync
+		"ui": &ui.Ui{},
+	}
+	if subc, ok := subcommands[flag.Arg(0)]; !ok {
+		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", flag.Arg(0))
+		flag.Usage()
+		os.Exit(1)
+	} else {
+		if err := subc.Parse(ctx, flag.Args()[1:]); err != nil {
+			os.Exit(1)
+		} else if _, err := subc.Execute(ctx, repo); err != nil {
+			os.Exit(1)
+		}
+	}
+}
