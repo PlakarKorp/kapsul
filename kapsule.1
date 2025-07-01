@@ -67,7 +67,7 @@ $ kapsule -f backup.ptar ls
 .Pp
 Create a new snapshot of the current directory:
 .Bd -literal -offset indent
-$ kapsule -f backup-new.ptar create
+$ kapsule -f backup-new.ptar create .
 .Ed
 .Pp
 Restore the file
@@ -76,7 +76,7 @@ from snapshot
 .Dq abcd
 inside the archive:
 .Bd -literal -offset indent
-$ kapsule -f backup.ptar cp . abcd:notes.md ./
+$ kapsule -f backup.ptar restore -to . abcd:notes.md
 .Ed
 .Sh SEE ALSO
 .Xr plakar 1 ,
