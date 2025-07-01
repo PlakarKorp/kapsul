@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/PlakarKorp/kloset v1.0.1-beta.2
-	github.com/PlakarKorp/plakar v1.0.3-devel
+	github.com/PlakarKorp/plakar v1.0.3-devel.c7a66f1
 	github.com/pkg/sftp v1.13.9
 	github.com/pkg/xattr v0.4.10
 	github.com/stretchr/testify v1.10.0
