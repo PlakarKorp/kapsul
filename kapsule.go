@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	_ "github.com/PlakarKorp/kapsule/connectors/fs"
 	_ "github.com/PlakarKorp/kapsule/connectors/ptar"
@@ -32,13 +33,28 @@ import (
 
 func main() {
 	var kapsulePath string
+	var ncores int
 	flag.StringVar(&kapsulePath, "f", "", "Path to the kapsule")
+	flag.IntVar(&ncores, "c", 0, "Number of cores to use (default: all available cores -1)")
 	flag.Parse()
 
 	if flag.NArg() == 0 {
 		flag.Usage()
 		return
 	}
+
+	numcpu := runtime.NumCPU()
+	if ncores < 0 || ncores > numcpu {
+		fmt.Fprintf(os.Stderr, "Invalid number of cores: %d. Must be between 0 and %d.\n", ncores, numcpu)
+		return
+	}
+	if ncores == 0 {
+		ncores = numcpu - 1
+		if ncores < 1 {
+			ncores = 1
+		}
+	}
+	runtime.GOMAXPROCS(ncores)
 
 	cwd, err := os.Getwd()
 	if err != nil {
