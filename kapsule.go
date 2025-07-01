@@ -62,13 +62,21 @@ func main() {
 		return
 	}
 
+	// how do I create a temporary directory?
+	tmp, err := os.MkdirTemp("", "kapsule")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating temporary directory: %v\n", err)
+		return
+	}
+	defer os.RemoveAll(tmp)
+
 	ctx := appcontext.NewAppContext()
 	ctx.CWD = cwd
 	ctx.MaxConcurrency = 42
-	ctx.SetCookies(cookies.NewManager("/tmp/plakar_cookies"))
+	ctx.SetCookies(cookies.NewManager(tmp))
 
 	ctx.SetLogger(logging.NewLogger(os.Stdout, os.Stderr))
-	ctx.SetCache(caching.NewManager("/tmp/foobar"))
+	ctx.SetCache(caching.NewManager(tmp))
 
 	if flag.Arg(0) == "create" {
 		repo, err := repository.Inexistent(ctx.GetInner(), map[string]string{
