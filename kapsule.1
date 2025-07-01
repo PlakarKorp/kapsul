@@ -1,0 +1,83 @@
+.Dd July 1, 2025
+.Dt KAPSULE 1
+.Os
+.Sh NAME
+.Nm kapsule
+.Nd create and inspect ptar archives
+.Sh SYNOPSIS
+.Nm
+.Op Fl c Ar cores
+.Op Fl f Ar archive
+.Ar subcommand ...
+.Sh DESCRIPTION
+.Nm
+is a program that exposes most of the
+.Xr plakar 1
+sub‑commands while operating on a
+.Sy ptar
+archive instead of a live Plakar repository.
+It transparently mounts the archive as an in‑memory, read-only
+repository and tears it down when the command finishes, allowing all
+supported Plakar functionality such as inspection, restore or diff
+without first extracting the archive.
+.Pp
+The following additional positional argument is recognised:
+.Bl -tag -width Ds
+.It Ar archive
+Path to the
+.Sy ptar
+archive to operate on. Use a single dash
+.Sq -
+to denote the standard input/output stream.
+.El
+.Pp
+Unless stated otherwise all Plakar options behave the same when used
+through
+.Nm .
+.Sh SUPPORTED COMMANDS
+The wrapper exposes the following Plakar sub‑commands:
+.Pp
+.Bl -tag -width maintenance -compact
+.It Cm archive
+.It Cm cat
+.It Cm check
+.It Cm create
+.It Cm diff
+.It Cm digest
+.It Cm help
+.It Cm info
+.It Cm locate
+.It Cm ls
+.It Cm mount
+.It Cm restore
+.It Cm server
+.It Cm ui
+.It Cm version
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width Ds
+.It Ev KAPSULE_PASSPHRASE
+Passphrase used to unlock the encrypted archive.
+.El
+.Sh EXAMPLES
+Inspect the list of snapshots inside an archive:
+.Bd -literal -offset indent
+$ kapsule -f backup.ptar ls
+.Ed
+.Pp
+Create a new snapshot of the current directory:
+.Bd -literal -offset indent
+$ kapsule -f backup-new.ptar create
+.Ed
+.Pp
+Restore the file
+.Dq notes.md
+from snapshot
+.Dq abcd
+inside the archive:
+.Bd -literal -offset indent
+$ kapsule -f backup.ptar cp . abcd:notes.md ./
+.Ed
+.Sh SEE ALSO
+.Xr plakar 1 ,
+.Xr ptar 5
