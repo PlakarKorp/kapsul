@@ -1,14 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
-	"runtime"
+	"strings"
 
 	"github.com/PlakarKorp/kloset/encryption"
 	"github.com/PlakarKorp/kloset/repository"
@@ -20,60 +17,12 @@ import (
 
 var ErrCantUnlock = errors.New("failed to unlock repository")
 
-func getpassphrase(ctx *appcontext.AppContext, params map[string]string) ([]byte, error) {
+func getpassphrase(ctx *appcontext.AppContext) ([]byte, error) {
 	if ctx.KeyFromFile != "" {
 		return []byte(ctx.KeyFromFile), nil
 	}
 
-	if pass, ok := params["passphrase"]; ok {
-		return []byte(pass), nil
-	}
-
-	if cmd, ok := params["passphrase_cmd"]; ok {
-		var c *exec.Cmd
-		switch runtime.GOOS {
-		case "windows":
-			c = exec.Command("cmd", "/C", cmd)
-		default: // assume unix-esque
-			c = exec.Command("/bin/sh", "-c", cmd)
-		}
-
-		stdout, err := c.StdoutPipe()
-		if err != nil {
-			return nil, err
-		}
-
-		if err := c.Start(); err != nil {
-			return nil, err
-		}
-
-		var pass string
-		var lines int
-		scan := bufio.NewScanner(stdout)
-		for scan.Scan() {
-			pass = scan.Text()
-			lines++
-		}
-
-		// don't deadlock in case the scanner fails
-		io.Copy(io.Discard, stdout)
-
-		if err := c.Wait(); err != nil {
-			return nil, err
-		}
-
-		if err := scan.Err(); err != nil {
-			return nil, err
-		}
-
-		if lines != 1 {
-			return nil, fmt.Errorf("passphrase_cmd returned too many lines")
-		}
-
-		return []byte(pass), nil
-	}
-
-	if pass, ok := os.LookupEnv("PLAKAR_PASSPHRASE"); ok {
+	if pass, ok := os.LookupEnv("KAPSULE_PASSPHRASE"); ok {
 		return []byte(pass), nil
 	}
 
@@ -85,7 +34,7 @@ func setupEncryption(ctx *appcontext.AppContext, config *storage.Configuration, 
 		return nil
 	}
 
-	secret, err := getpassphrase(ctx, params)
+	secret, err := getpassphrase(ctx)
 	if err != nil {
 		return err
 	}
@@ -126,6 +75,10 @@ func setupEncryption(ctx *appcontext.AppContext, config *storage.Configuration, 
 }
 
 func openKapsule(ctx *appcontext.AppContext, kapsule string) (*repository.Repository, error) {
+	if strings.HasPrefix(kapsule, "http://") ||
+		strings.HasPrefix(kapsule, "https://") {
+		kapsule = "ptar+" + kapsule
+	}
 
 	store, serializedConfig, err := storage.Open(ctx.GetInner(), map[string]string{
 		"location": kapsule,
