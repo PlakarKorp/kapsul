@@ -63,6 +63,12 @@ Restore the file `notes.md` from snapshot `abcd` inside the archive:
 kapsule -f backup.ptar restore -to . abcd:notes.md
 ```
 
+Launch the ui
+
+```sh
+kapsule -f backup.ptar ui
+```
+
 ## See Also
 
 - [`plakar(1)`](./plakar.1): The underlying backup engine
