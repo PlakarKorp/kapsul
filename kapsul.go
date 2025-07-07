@@ -6,10 +6,10 @@ import (
 	"os"
 	"runtime"
 
-	_ "github.com/PlakarKorp/kapsule/connectors/fs"
-	_ "github.com/PlakarKorp/kapsule/connectors/ptar"
-	_ "github.com/PlakarKorp/kapsule/connectors/sftp"
-	_ "github.com/PlakarKorp/kapsule/connectors/stdio"
+	_ "github.com/PlakarKorp/plakar/connectors/fs"
+	_ "github.com/PlakarKorp/plakar/connectors/ptar"
+	_ "github.com/PlakarKorp/plakar/connectors/sftp"
+	_ "github.com/PlakarKorp/plakar/connectors/stdio"
 
 	"github.com/PlakarKorp/kloset/caching"
 	"github.com/PlakarKorp/kloset/logging"
@@ -32,6 +32,11 @@ import (
 )
 
 func main() {
+
+	//importer.Register("fs", location.FLAG_LOCALFS, fs.NewFSImporter)
+	//exporter.Register("fs", location.FLAG_LOCALFS, fs.NewFSExporter)
+	//storage.Register(fs.NewStore, location.FLAG_LOCALFS, "fs")
+
 	var kapsulePath string
 	var ncores int
 	flag.StringVar(&kapsulePath, "f", "", "Path to the kapsule")
