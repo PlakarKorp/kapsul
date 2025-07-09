@@ -8,6 +8,12 @@
 - Supports most `plakar` commands
 - No persistent state or extraction required
 
+## Install
+
+```sh
+go install github.com/PlakarKorp/kapsul@v0.0.0-beta.10
+```
+
 ## Usage
 
 ```sh
