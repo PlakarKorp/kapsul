@@ -6,14 +6,17 @@ import (
 	"os"
 	"runtime"
 
-	_ "github.com/PlakarKorp/kapsul/connectors/fs"
 	_ "github.com/PlakarKorp/kapsul/connectors/ptar"
 	_ "github.com/PlakarKorp/kapsul/connectors/sftp"
 	_ "github.com/PlakarKorp/kapsul/connectors/stdio"
 
+	fs "github.com/PlakarKorp/integration-fs"
 	"github.com/PlakarKorp/kloset/caching"
+	"github.com/PlakarKorp/kloset/location"
 	"github.com/PlakarKorp/kloset/logging"
 	"github.com/PlakarKorp/kloset/repository"
+	"github.com/PlakarKorp/kloset/snapshot/exporter"
+	"github.com/PlakarKorp/kloset/snapshot/importer"
 	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/cookies"
 	"github.com/PlakarKorp/plakar/subcommands"
@@ -30,6 +33,11 @@ import (
 	"github.com/PlakarKorp/plakar/subcommands/server"
 	"github.com/PlakarKorp/plakar/subcommands/ui"
 )
+
+func init() {
+	importer.Register("fs", location.FLAG_LOCALFS, fs.NewFSImporter)
+	exporter.Register("fs", location.FLAG_LOCALFS, fs.NewFSExporter)
+}
 
 func main() {
 	var kapsulPath string

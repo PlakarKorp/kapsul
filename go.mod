@@ -1,8 +1,9 @@
 module github.com/PlakarKorp/kapsul
 
-go 1.23.4
+go 1.24.4
 
 require (
+	github.com/PlakarKorp/integration-fs v1.0.2
 	github.com/PlakarKorp/kloset v1.0.1-beta.2.0.20250708200005-9fa0c7fa1fc0
 	github.com/PlakarKorp/plakar v1.0.3-devel.c7a66f1.0.20250709080253-847bbea86894
 	github.com/pkg/sftp v1.13.9
