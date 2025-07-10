@@ -6,10 +6,10 @@ import (
 	"os"
 	"runtime"
 
-	_ "github.com/PlakarKorp/kapsule/connectors/fs"
-	_ "github.com/PlakarKorp/kapsule/connectors/ptar"
-	_ "github.com/PlakarKorp/kapsule/connectors/sftp"
-	_ "github.com/PlakarKorp/kapsule/connectors/stdio"
+	_ "github.com/PlakarKorp/kapsul/connectors/fs"
+	_ "github.com/PlakarKorp/kapsul/connectors/ptar"
+	_ "github.com/PlakarKorp/kapsul/connectors/sftp"
+	_ "github.com/PlakarKorp/kapsul/connectors/stdio"
 
 	"github.com/PlakarKorp/kloset/caching"
 	"github.com/PlakarKorp/kloset/logging"
@@ -32,9 +32,9 @@ import (
 )
 
 func main() {
-	var kapsulePath string
+	var kapsulPath string
 	var ncores int
-	flag.StringVar(&kapsulePath, "f", "", "Path to the kapsule")
+	flag.StringVar(&kapsulPath, "f", "", "Path to the kapsul")
 	flag.IntVar(&ncores, "c", 0, "Number of cores to use (default: all available cores -1)")
 	flag.Parse()
 
@@ -63,7 +63,7 @@ func main() {
 	}
 
 	// how do I create a temporary directory?
-	tmp, err := os.MkdirTemp("", "kapsule")
+	tmp, err := os.MkdirTemp("", "kapsul")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating temporary directory: %v\n", err)
 		return
@@ -80,15 +80,15 @@ func main() {
 
 	if flag.Arg(0) == "create" {
 		repo, err := repository.Inexistent(ctx.GetInner(), map[string]string{
-			"location": kapsulePath,
+			"location": kapsulPath,
 		})
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error creating kapsule: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error creating kapsul: %v\n", err)
 			return
 		}
 
 		subc := &ptar.Ptar{}
-		args := append([]string{"-o", kapsulePath}, flag.Args()[1:]...)
+		args := append([]string{"-o", kapsulPath}, flag.Args()[1:]...)
 		if err := subc.Parse(ctx, args); err != nil {
 			fmt.Fprintf(os.Stderr, "Error parsing ptar command: %v\n", err)
 			os.Exit(1)
@@ -99,9 +99,9 @@ func main() {
 		return
 	}
 
-	repo, err := openKapsule(ctx, kapsulePath)
+	repo, err := openKapsule(ctx, kapsulPath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening kapsule: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error opening kapsul: %v\n", err)
 		return
 	}
 	defer repo.Close()
