@@ -1,4 +1,4 @@
-module github.com/PlakarKorp/kapsule
+module github.com/PlakarKorp/kapsul
 
 go 1.23.4
 
