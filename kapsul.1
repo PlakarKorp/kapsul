@@ -1,8 +1,8 @@
 .Dd July 10, 2025
-.Dt KAPSULE 1
+.Dt KAPSUL 1
 .Os
 .Sh NAME
-.Nm kapsule
+.Nm kapsul
 .Nd create and inspect ptar archives
 .Sh SYNOPSIS
 .Nm
@@ -57,18 +57,18 @@ The wrapper exposes the following Plakar sub‑commands:
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
-.It Ev KAPSULE_PASSPHRASE
+.It Ev KAPSUL_PASSPHRASE
 Passphrase used to unlock the encrypted archive.
 .El
 .Sh EXAMPLES
 Inspect the list of snapshots inside an archive:
 .Bd -literal -offset indent
-$ kapsule -f backup.ptar ls
+$ kapsul -f backup.ptar ls
 .Ed
 .Pp
 Create a new snapshot of the current directory:
 .Bd -literal -offset indent
-$ kapsule -f backup-new.ptar create .
+$ kapsul -f backup-new.ptar create .
 .Ed
 .Pp
 Restore the file
@@ -77,7 +77,7 @@ from snapshot
 .Dq abcd
 inside the archive:
 .Bd -literal -offset indent
-$ kapsule -f backup.ptar restore -to . abcd:notes.md
+$ kapsul -f backup.ptar restore -to . abcd:notes.md
 .Ed
 .Sh SEE ALSO
 .Xr plakar 1 ,

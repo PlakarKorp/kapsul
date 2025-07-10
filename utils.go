@@ -22,7 +22,7 @@ func getpassphrase(ctx *appcontext.AppContext) ([]byte, error) {
 		return []byte(ctx.KeyFromFile), nil
 	}
 
-	if pass, ok := os.LookupEnv("KAPSULE_PASSPHRASE"); ok {
+	if pass, ok := os.LookupEnv("KAPSUL_PASSPHRASE"); ok {
 		return []byte(pass), nil
 	}
 
