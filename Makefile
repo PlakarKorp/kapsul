@@ -20,4 +20,7 @@ install:
 	${INSTALL_PROGRAM} kapsul ${DESTDIR}${BINDIR}
 	${INSTALL_MAN} kapsul.1 ${DESTDIR}${MANDIR}/man1
 
-.PHONY: all kloset install
+clean:
+	rm kapsul
+
+.PHONY: all kloset install clean
